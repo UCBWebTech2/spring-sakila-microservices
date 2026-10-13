@@ -2,8 +2,10 @@ package com.ucb.sakila.businessservice.store;
 
 import com.ucb.sakila.businessservice.shared.PageInfo;
 import com.ucb.sakila.businessservice.shared.PageResult;
+import com.ucb.sakila.businessservice.shared.PgErrors;
 import com.ucb.sakila.businessservice.staff.StaffNotFoundException;
 import com.ucb.sakila.businessservice.staff.StaffRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ public class StoreService {
 
     private final StoreRepository storeRepository;
     private final StaffRepository staffRepository;
+    private final EntityManager entityManager;
 
     public PageResult<Store> findAll(int page, int limit) {
         var result = storeRepository.findAll(PageRequest.of(page - 1, limit, Sort.by("id")));
@@ -35,7 +38,11 @@ public class StoreService {
         store.setManagerStaffId(input.managerStaffId());
         store.setAddressId(input.addressId());
         store.setLastUpdate(LocalDateTime.now());
-        return storeRepository.save(store);
+        try {
+            return storeRepository.save(store);
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 
     @Transactional
@@ -47,12 +54,22 @@ public class StoreService {
         }
         if (input.addressId() != null) store.setAddressId(input.addressId());
         store.setLastUpdate(LocalDateTime.now());
+        try {
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
         return store;
     }
 
     @Transactional
     public void remove(Integer id) {
         if (!storeRepository.existsById(id)) throw new StoreNotFoundException();
-        storeRepository.deleteById(id);
+        try {
+            storeRepository.deleteById(id);
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 }

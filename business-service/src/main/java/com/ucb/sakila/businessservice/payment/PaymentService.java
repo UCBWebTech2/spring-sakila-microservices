@@ -5,9 +5,11 @@ import com.ucb.sakila.businessservice.rental.RentalNotFoundException;
 import com.ucb.sakila.businessservice.rental.RentalRepository;
 import com.ucb.sakila.businessservice.shared.PageInfo;
 import com.ucb.sakila.businessservice.shared.PageResult;
+import com.ucb.sakila.businessservice.shared.PgErrors;
 import com.ucb.sakila.businessservice.staff.Staff;
 import com.ucb.sakila.businessservice.staff.StaffNotFoundException;
 import com.ucb.sakila.businessservice.staff.StaffRepository;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final StaffRepository staffRepository;
     private final RentalRepository rentalRepository;
+    private final EntityManager entityManager;
 
     public PageResult<Payment> findAll(int page, int limit) {
         var result = paymentRepository.findAll(PageRequest.of(page - 1, limit, Sort.by("id")));
@@ -44,12 +47,23 @@ public class PaymentService {
         payment.setRental(rental);
         payment.setAmount(BigDecimal.valueOf(input.amount()));
         payment.setPaymentDate(LocalDateTime.parse(input.paymentDate()));
-        return paymentRepository.save(payment);
+        try {
+            Payment saved = paymentRepository.save(payment);
+            entityManager.flush();
+            return saved;
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 
     @Transactional
     public void remove(Integer id) {
         if (!paymentRepository.existsById(id)) throw new PaymentNotFoundException();
-        paymentRepository.deleteById(id);
+        try {
+            paymentRepository.deleteById(id);
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 }

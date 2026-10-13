@@ -2,9 +2,11 @@ package com.ucb.sakila.businessservice.rental;
 
 import com.ucb.sakila.businessservice.shared.PageInfo;
 import com.ucb.sakila.businessservice.shared.PageResult;
+import com.ucb.sakila.businessservice.shared.PgErrors;
 import com.ucb.sakila.businessservice.staff.Staff;
 import com.ucb.sakila.businessservice.staff.StaffNotFoundException;
 import com.ucb.sakila.businessservice.staff.StaffRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ public class RentalService {
 
     private final RentalRepository rentalRepository;
     private final StaffRepository staffRepository;
+    private final EntityManager entityManager;
 
     public PageResult<Rental> findAll(int page, int limit) {
         var result = rentalRepository.findAll(PageRequest.of(page - 1, limit, Sort.by("id")));
@@ -38,7 +41,11 @@ public class RentalService {
         rental.setCustomerId(input.customerId());
         rental.setStaff(staff);
         rental.setLastUpdate(LocalDateTime.now());
-        return rentalRepository.save(rental);
+        try {
+            return rentalRepository.save(rental);
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 
     @Transactional
@@ -49,12 +56,22 @@ public class RentalService {
             rental.setStaff(staffRepository.findById(input.staffId()).orElseThrow(StaffNotFoundException::new));
         }
         rental.setLastUpdate(LocalDateTime.now());
+        try {
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
         return rental;
     }
 
     @Transactional
     public void remove(Integer id) {
         if (!rentalRepository.existsById(id)) throw new RentalNotFoundException();
-        rentalRepository.deleteById(id);
+        try {
+            rentalRepository.deleteById(id);
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 }

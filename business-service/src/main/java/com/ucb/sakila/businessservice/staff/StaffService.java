@@ -2,11 +2,14 @@ package com.ucb.sakila.businessservice.staff;
 
 import com.ucb.sakila.businessservice.shared.PageInfo;
 import com.ucb.sakila.businessservice.shared.PageResult;
+import com.ucb.sakila.businessservice.shared.PgErrors;
 import com.ucb.sakila.businessservice.store.Store;
 import com.ucb.sakila.businessservice.store.StoreNotFoundException;
 import com.ucb.sakila.businessservice.store.StoreRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +23,7 @@ public class StaffService {
     private final StaffRepository staffRepository;
     private final StoreRepository storeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     public PageResult<Staff> findAll(int page, int limit) {
         var result = staffRepository.findAll(PageRequest.of(page - 1, limit, Sort.by("id")));
@@ -47,7 +51,11 @@ public class StaffService {
         staff.setPassword(passwordEncoder.encode(input.password()));
         staff.setActive(true);
         staff.setLastUpdate(LocalDateTime.now());
-        return staffRepository.save(staff);
+        try {
+            return staffRepository.save(staff);
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 
     @Transactional
@@ -63,13 +71,23 @@ public class StaffService {
         if (input.active() != null) staff.setActive(input.active());
         if (input.username() != null) staff.setUsername(input.username());
         staff.setLastUpdate(LocalDateTime.now());
+        try {
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
         return staff;
     }
 
     @Transactional
     public void remove(Integer id) {
         if (!staffRepository.existsById(id)) throw new StaffNotFoundException();
-        staffRepository.deleteById(id);
+        try {
+            staffRepository.deleteById(id);
+            entityManager.flush();
+        } catch (RuntimeException ex) {
+            throw PgErrors.translate(ex);
+        }
     }
 
     // "no existe", "contraseña incorrecta" e "inactivo" dan el mismo error, a propósito.
