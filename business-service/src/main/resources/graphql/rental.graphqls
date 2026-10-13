@@ -1,0 +1,37 @@
+type Rental {
+    id: ID!
+    rentalDate: String!
+    inventoryId: Int!
+    customerId: Int!
+    returnDate: String
+    staff: Staff!
+    lastUpdate: String!
+}
+
+type RentalConnection {
+    data: [Rental!]!
+    meta: PageInfo!
+}
+
+input CreateRentalInput {
+    rentalDate: String!
+    inventoryId: Int!
+    customerId: Int!
+    staffId: Int!
+}
+
+input UpdateRentalInput {
+    returnDate: String
+    staffId: Int
+}
+
+extend type Query {
+    rental(id: ID!): Rental!
+    rentals(page: Int = 1, limit: Int = 10): RentalConnection!
+}
+
+extend type Mutation {
+    createRental(input: CreateRentalInput!): Rental!
+    updateRental(id: ID!, input: UpdateRentalInput!): Rental!
+    removeRental(id: ID!): Boolean!
+}

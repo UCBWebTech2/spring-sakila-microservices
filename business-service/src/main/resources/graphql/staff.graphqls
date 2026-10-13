@@ -1,0 +1,55 @@
+type Staff {
+    id: ID!
+    firstName: String!
+    lastName: String!
+    addressId: Int!
+    email: String
+    store: Store!
+    active: Boolean!
+    username: String!
+    lastUpdate: String!
+}
+
+type StaffConnection {
+    data: [Staff!]!
+    meta: PageInfo!
+}
+
+input CreateStaffInput {
+    firstName: String!
+    lastName: String!
+    addressId: Int!
+    email: String
+    storeId: Int!
+    username: String!
+    password: String!
+}
+
+input UpdateStaffInput {
+    firstName: String
+    lastName: String
+    addressId: Int
+    email: String
+    storeId: Int
+    active: Boolean
+    username: String
+}
+
+input StaffLoginInput {
+    username: String!
+    password: String!
+}
+
+extend type Query {
+    staff(id: ID!): Staff!
+    staffs(page: Int = 1, limit: Int = 10): StaffConnection!
+}
+
+extend type Mutation {
+    createStaff(input: CreateStaffInput!): Staff!
+    updateStaff(id: ID!, input: UpdateStaffInput!): Staff!
+    removeStaff(id: ID!): Boolean!
+
+    "Verifica usuario/password contra el hash guardado y devuelve el Staff si son válidas. No firma ningún token — eso lo hace el api-gateway con el resultado de esta mutation."
+    staffLogin(input: StaffLoginInput!): Staff!
+}

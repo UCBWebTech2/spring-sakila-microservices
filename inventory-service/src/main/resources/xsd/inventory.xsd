@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://inventory.sakila.ucb.com/schema"
+           targetNamespace="http://inventory.sakila.ucb.com/schema"
+           elementFormDefault="qualified">
+
+    <xs:complexType name="pageInfo">
+        <xs:sequence>
+            <xs:element name="page" type="xs:int"/>
+            <xs:element name="limit" type="xs:int"/>
+            <xs:element name="total" type="xs:long"/>
+            <xs:element name="pages" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ===== Language ===== -->
+    <xs:complexType name="language">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="lastUpdate" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ListLanguagesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" default="1" minOccurs="0"/>
+                <xs:element name="limit" type="xs:int" default="10" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ListLanguagesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="data" type="tns:language" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="meta" type="tns:pageInfo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetLanguageRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetLanguageResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="language" type="tns:language"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CreateLanguageRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CreateLanguageResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="language" type="tns:language"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="UpdateLanguageRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateLanguageResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="language" type="tns:language"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeleteLanguageRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteLanguageResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="success" type="xs:boolean"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ===== Category ===== -->
+    <xs:complexType name="category">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="lastUpdate" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ListCategoriesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" default="1" minOccurs="0"/>
+                <xs:element name="limit" type="xs:int" default="10" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ListCategoriesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="data" type="tns:category" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="meta" type="tns:pageInfo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetCategoryRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetCategoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="category" type="tns:category"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CreateCategoryRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="name" type="xs:string"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CreateCategoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="category" type="tns:category"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="UpdateCategoryRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateCategoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="category" type="tns:category"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeleteCategoryRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteCategoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="success" type="xs:boolean"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ===== Actor ===== -->
+    <xs:complexType name="actor">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="firstName" type="xs:string"/>
+            <xs:element name="lastName" type="xs:string"/>
+            <xs:element name="lastUpdate" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ListActorsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" default="1" minOccurs="0"/>
+                <xs:element name="limit" type="xs:int" default="10" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ListActorsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="data" type="tns:actor" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="meta" type="tns:pageInfo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetActorRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetActorResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="actor" type="tns:actor"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CreateActorRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="firstName" type="xs:string"/>
+                <xs:element name="lastName" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CreateActorResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="actor" type="tns:actor"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="UpdateActorRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+                <xs:element name="firstName" type="xs:string" minOccurs="0"/>
+                <xs:element name="lastName" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateActorResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="actor" type="tns:actor"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeleteActorRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteActorResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="success" type="xs:boolean"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ===== Film ===== -->
+    <xs:complexType name="film">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="description" type="xs:string" minOccurs="0"/>
+            <xs:element name="languageId" type="xs:int"/>
+            <xs:element name="originalLanguageId" type="xs:int" minOccurs="0"/>
+            <xs:element name="rentalDuration" type="xs:int"/>
+            <xs:element name="rentalRate" type="xs:decimal"/>
+            <xs:element name="length" type="xs:int" minOccurs="0"/>
+            <xs:element name="replacementCost" type="xs:decimal"/>
+            <xs:element name="lastUpdate" type="xs:dateTime"/>
+            <xs:element name="actorId" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="categoryId" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ListFilmsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" default="1" minOccurs="0"/>
+                <xs:element name="limit" type="xs:int" default="10" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ListFilmsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="data" type="tns:film" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="meta" type="tns:pageInfo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetFilmRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetFilmResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="film" type="tns:film"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CreateFilmRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="description" type="xs:string" minOccurs="0"/>
+                <xs:element name="languageId" type="xs:int"/>
+                <xs:element name="originalLanguageId" type="xs:int" minOccurs="0"/>
+                <xs:element name="rentalDuration" type="xs:int"/>
+                <xs:element name="rentalRate" type="xs:decimal"/>
+                <xs:element name="length" type="xs:int" minOccurs="0"/>
+                <xs:element name="replacementCost" type="xs:decimal"/>
+                <xs:element name="actorId" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="categoryId" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CreateFilmResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="film" type="tns:film"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="UpdateFilmRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+                <xs:element name="title" type="xs:string" minOccurs="0"/>
+                <xs:element name="description" type="xs:string" minOccurs="0"/>
+                <xs:element name="rentalRate" type="xs:decimal" minOccurs="0"/>
+                <xs:element name="replacementCost" type="xs:decimal" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateFilmResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="film" type="tns:film"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeleteFilmRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteFilmResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="success" type="xs:boolean"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ===== Inventory ===== -->
+    <xs:complexType name="inventoryItem">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="filmId" type="xs:int"/>
+            <xs:element name="storeId" type="xs:int"/>
+            <xs:element name="lastUpdate" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="ListInventoriesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="xs:int" default="1" minOccurs="0"/>
+                <xs:element name="limit" type="xs:int" default="10" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ListInventoriesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="data" type="tns:inventoryItem" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="meta" type="tns:pageInfo"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="GetInventoryRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GetInventoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="inventoryItem" type="tns:inventoryItem"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CreateInventoryRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="filmId" type="xs:int"/>
+                <xs:element name="storeId" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CreateInventoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="inventoryItem" type="tns:inventoryItem"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="UpdateInventoryRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+                <xs:element name="filmId" type="xs:int" minOccurs="0"/>
+                <xs:element name="storeId" type="xs:int" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="UpdateInventoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="inventoryItem" type="tns:inventoryItem"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DeleteInventoryRequest">
+        <xs:complexType>
+            <xs:sequence><xs:element name="id" type="xs:int"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="DeleteInventoryResponse">
+        <xs:complexType>
+            <xs:sequence><xs:element name="success" type="xs:boolean"/></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -1,0 +1,32 @@
+type Store {
+    id: ID!
+    manager: Staff!
+    addressId: Int!
+    lastUpdate: String!
+}
+
+type StoreConnection {
+    data: [Store!]!
+    meta: PageInfo!
+}
+
+input CreateStoreInput {
+    managerStaffId: Int!
+    addressId: Int!
+}
+
+input UpdateStoreInput {
+    managerStaffId: Int
+    addressId: Int
+}
+
+extend type Query {
+    store(id: ID!): Store!
+    stores(page: Int = 1, limit: Int = 10): StoreConnection!
+}
+
+extend type Mutation {
+    createStore(input: CreateStoreInput!): Store!
+    updateStore(id: ID!, input: UpdateStoreInput!): Store!
+    removeStore(id: ID!): Boolean!
+}

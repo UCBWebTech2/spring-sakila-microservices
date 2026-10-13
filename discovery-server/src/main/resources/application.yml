@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: discovery-server
+
+# Puerto convencional de Eureka (el que todo el mundo espera por defecto cuando no se indica otro).
+server:
+  port: 8761
+
+eureka:
+  client:
+    # Este servicio ES el registro — no tiene que registrarse a sí mismo ni consultar a otro.
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    # En un entorno de un solo nodo, la auto-preservación solo agrega ruido de advertencias.
+    enable-self-preservation: false

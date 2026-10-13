@@ -1,0 +1,168 @@
+# docker compose up -d --build. Opcional: DB_PASSWORD, JWT_SECRET (env vars o .env).
+
+networks:
+  sakila-net:
+    name: spring-sakila-network
+    driver: bridge
+
+# Conexión a la base de datos dentro de la red (db:5432).
+x-db-env: &db-env
+  DB_HOST:     db
+  DB_PORT:     "5432"
+  DB_USER:     postgres
+  DB_PASSWORD: ${DB_PASSWORD:-postgres}
+  DB_NAME:     sakila
+
+x-eureka-env: &eureka-env
+  EUREKA_URL: http://discovery-server:8761/eureka/
+
+# Puertos publicados solo en 127.0.0.1.
+
+services:
+  # --- Infraestructura ---------------------------------------------------------------------------
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      POSTGRES_DB:       sakila
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      # 5434: libre en esta máquina (5432/5433 ya usados por otros proyectos).
+      - "127.0.0.1:5434:5432"
+    volumes:
+      # postgres:18 guarda los datos bajo /var/lib/postgresql, no .../data.
+      - db_data:/var/lib/postgresql
+      - ./db/postgres-sakila-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./db/postgres-sakila-insert-data.sql:/docker-entrypoint-initdb.d/02-insert-data.sql:ro
+      - ./db/business-service.sql:/docker-entrypoint-initdb.d/03-business-service.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sakila"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      # 5673/15673: libres (5672/15672 ya usados por otro proyecto).
+      - "127.0.0.1:5673:5672"
+      - "127.0.0.1:15673:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  discovery-server:
+    build: ./discovery-server
+    restart: unless-stopped
+    networks: [sakila-net]
+    ports:
+      - "127.0.0.1:8761:8761"
+
+  # --- Microservicios ------------------------------------------------------------------------------
+  business-service:                                  # GraphQL
+    build: ./business-service
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      <<: [*db-env, *eureka-env]
+      PORT: "8081"
+    ports:
+      - "127.0.0.1:8081:8081"                        # http://localhost:8081/graphiql
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+
+  customer-service:                                  # gRPC (customer, address) + RabbitMQ (city, country)
+    build: ./customer-service
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      <<: [*db-env, *eureka-env]
+      PORT:             "8082"
+      GRPC_PORT:        "50051"
+      RABBITMQ_HOST:    rabbitmq
+      RABBITMQ_PORT:    "5672"
+      RABBITMQ_USER:    guest
+      RABBITMQ_PASSWORD: guest
+    ports:
+      - "127.0.0.1:8082:8082"
+      - "127.0.0.1:50051:50051"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+
+  inventory-service:                                 # SOAP
+    build: ./inventory-service
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      <<: [*db-env, *eureka-env]
+      PORT: "8083"
+    ports:
+      - "127.0.0.1:8083:8083"                        # http://localhost:8083/ws/inventory.wsdl
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+
+  reporting-service:                                 # WebSocket (STOMP)
+    build: ./reporting-service
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      <<: [*db-env, *eureka-env]
+      PORT: "8084"
+    ports:
+      - "127.0.0.1:8084:8084"                        # ws://localhost:8084/ws
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+
+  # --- Punto de entrada ----------------------------------------------------------------------------
+  api-gateway:                                       # REST + Swagger + JWT
+    build: ./api-gateway
+    restart: unless-stopped
+    networks: [sakila-net]
+    environment:
+      <<: *eureka-env
+      PORT:              "8090"
+      RABBITMQ_HOST:     rabbitmq
+      RABBITMQ_PORT:     "5672"
+      RABBITMQ_USER:     guest
+      RABBITMQ_PASSWORD: guest
+      # Solo desarrollo — cambiar vía JWT_SECRET antes de exponer esto.
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-before-exposing-this-gateway-anywhere-32-bytes-min}
+    ports:
+      - "127.0.0.1:8090:8090"                        # http://localhost:8090/api/swagger-ui.html
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      business-service:
+        condition: service_healthy
+      customer-service:
+        condition: service_healthy
+      inventory-service:
+        condition: service_healthy
+      reporting-service:
+        condition: service_healthy
+
+volumes:
+  db_data:

@@ -1,0 +1,12 @@
+# Raíz del schema. Spring for GraphQL junta todos los *.graphqls de este directorio — cada
+# feature (staff.graphqls, store.graphqls, ...) extiende Query/Mutation acá declarados en vez de
+# redeclarar el type completo.
+type Query
+type Mutation
+
+type PageInfo {
+    page: Int!
+    limit: Int!
+    total: Int!
+    pages: Int!
+}

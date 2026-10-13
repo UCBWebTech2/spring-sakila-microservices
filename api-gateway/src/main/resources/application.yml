@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: api-gateway
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    template:
+      reply-timeout: 10000
+
+server:
+  # No 8080: en esta máquina ya lo usa otro contenedor Docker ajeno a este proyecto.
+  port: ${PORT:8090}
+  # Mismo prefijo /api que tenía el gateway en Nest — misma forma de llamar a la API desde afuera.
+  servlet:
+    context-path: /api
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Solo desarrollo — cambiar antes de exponer este gateway fuera de la máquina.
+  secret: ${JWT_SECRET:dev-only-secret-change-me-before-exposing-this-gateway-anywhere-32-bytes-min}
+  expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}

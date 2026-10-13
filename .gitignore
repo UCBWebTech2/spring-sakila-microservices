@@ -1,0 +1,17 @@
+# Compilado de cada módulo Maven
+target/
+*.class
+
+# Editor y sistema operativo
+.idea/
+*.iws
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.DS_Store
+
+# Logs
+*.log

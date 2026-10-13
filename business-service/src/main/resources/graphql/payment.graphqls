@@ -1,0 +1,31 @@
+type Payment {
+    id: ID!
+    customerId: Int!
+    staff: Staff!
+    rental: Rental!
+    amount: Float!
+    paymentDate: String!
+}
+
+type PaymentConnection {
+    data: [Payment!]!
+    meta: PageInfo!
+}
+
+input CreatePaymentInput {
+    customerId: Int!
+    staffId: Int!
+    rentalId: Int!
+    amount: Float!
+    paymentDate: String!
+}
+
+extend type Query {
+    payment(id: ID!): Payment!
+    payments(page: Int = 1, limit: Int = 10): PaymentConnection!
+}
+
+extend type Mutation {
+    createPayment(input: CreatePaymentInput!): Payment!
+    removePayment(id: ID!): Boolean!
+}
