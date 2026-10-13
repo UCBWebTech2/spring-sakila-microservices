@@ -152,17 +152,6 @@ services:
       JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-before-exposing-this-gateway-anywhere-32-bytes-min}
     ports:
       - "127.0.0.1:8090:8090"                        # http://localhost:8090/api/swagger-ui.html
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      business-service:
-        condition: service_healthy
-      customer-service:
-        condition: service_healthy
-      inventory-service:
-        condition: service_healthy
-      reporting-service:
-        condition: service_healthy
 
 volumes:
   db_data:
